@@ -4,10 +4,6 @@ const PORT = 3000;
 const mongoose = require("mongoose");
 const { MONGOURI } = require("./keys");
 
-require("./models/user");
-app.use(express.json()); // this will accept json values
-app.use(require("./routes/auth"));
-
 /*Mongo connection*/
 mongoose.connect(MONGOURI, {
   useNewUrlParser: "true",
@@ -19,7 +15,13 @@ mongoose.connection.on("connected", () => {
 mongoose.connection.on("error", (err) => {
   console.log("There was an error", err);
 });
+
 /*Mongo connection end*/
+require("./models/user");
+require("./models/post");
+app.use(express.json()); // this will accept json values
+app.use(require("./routes/auth"));
+app.use(require("./routes/post"));
 /*Middleware*/
 const middleware = (req, res, next) => {
   console.log("This is the middle for about");
