@@ -17,12 +17,12 @@ router.get("/protected", requireLogin, (req, res) => {
 router.post("/signup", (req, res) => {
   const { name, email, password } = req.body;
   if (!name || !email || !password) {
-    res.status(422).json({ error: "Please enter all fields" });
+    return res.json({ error: "Please enter all fields" });
   }
   User.findOne({ email: email })
     .then((savedUser) => {
       if (savedUser) {
-        return res.status(422).json({ error: "User exists with this email" });
+        return res.json({ error: "User exists with this email" });
       }
       bcrypt.hash(password, 12).then((hashedPassword) => {
         const user = new User({
@@ -49,23 +49,24 @@ router.post("/signup", (req, res) => {
 router.post("/signin", (req, res) => {
   const { email, password } = req.body;
   if (!email || !password) {
-    return res.status(422).json({ message: "Enter the given fields" });
+    return res.json({ message: "Enter the given fields" });
   }
   User.findOne({ email: email })
     .then((savedUser) => {
       if (!savedUser) {
-        return res.status(422).json({ error: "Given email is not registered" });
+        return res.json({ error: "Given email is not registered" });
       }
       bcrypt
         .compare(password, savedUser.password)
         .then((matched) => {
           if (!matched) {
-            return res.status(422).json({ error: "Password did not match" });
+            return res.json({ error: "Password did not match" });
           } else {
             /*res.json({ message: "User logged in" });
             return savedUser;*/
+            const { _id, name, email } = savedUser;
             const token = jwt.sign({ _id: savedUser._id }, JWT_SECRET);
-            res.json({ token: token });
+            res.json({ token: token, user: { _id, name, email } });
           }
         })
         .catch((err) => {
