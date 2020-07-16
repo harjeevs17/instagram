@@ -47,4 +47,41 @@ router.get("/myposts", requireLogin, (req, res) => {
     });
 });
 
+router.put("/like", requireLogin, (req, res) => {
+  console.log("backend", req.user._id);
+  Post.findByIdAndUpdate(
+    { _id: req.body.postId },
+    {
+      $push: { likes: req.user._id },
+    },
+    {
+      new: true,
+    }
+  ).exec((err, result) => {
+    if (err) {
+      res.json({ error: err });
+    } else {
+      res.json({ message: "Liked successfully" });
+    }
+  });
+});
+
+router.put("/unlike", requireLogin, (req, res) => {
+  Post.findByIdAndUpdate(
+    { _id: req.body.postId },
+    {
+      $pull: { likes: req.user._id },
+    },
+    {
+      new: true,
+    }
+  ).exec((err, result) => {
+    if (err) {
+      res.json({ error: err });
+    } else {
+      res.json({ message: "Unliked successfully" });
+    }
+  });
+});
+
 module.exports = router;
