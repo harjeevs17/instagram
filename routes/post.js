@@ -8,6 +8,7 @@ const requireLogin = require("../middleware/requireLogin");
 router.get("/allpost", requireLogin, (req, res) => {
   Post.find()
     .populate("postedBy", "_id name")
+    .populate("comments.postedBy", "_id name")
     .then((result) => {
       res.json({ posts: result });
     })
@@ -86,6 +87,30 @@ router.put("/unlike", requireLogin, (req, res) => {
       res.json({ message: "Unliked successfully", likes: result.likes.length });
     }
   });
+});
+
+router.put("/comment", requireLogin, (req, res) => {
+  const data = {
+    text: req.body.comment,
+    postedBy: req.user._id,
+  };
+  Post.findByIdAndUpdate(
+    { _id: req.body.postId },
+    {
+      $push: { comments: data },
+    },
+    {
+      new: true,
+    }
+  )
+    .populate("comments.postedBy", "_id name")
+    .exec((err, result) => {
+      if (err) {
+        res.json({ error: err });
+      } else {
+        res.json({ message: "Commend added successfully" });
+      }
+    });
 });
 
 module.exports = router;
