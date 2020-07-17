@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
 const Post = mongoose.model("Post");
+mongoose.set("useFindAndModify", false);
 
 const requireLogin = require("../middleware/requireLogin");
 router.get("/allpost", requireLogin, (req, res) => {
@@ -48,29 +49,31 @@ router.get("/myposts", requireLogin, (req, res) => {
 });
 
 router.put("/like", requireLogin, (req, res) => {
-  console.log("backend", req.user._id);
+  console.log("backendLL", req.user._id);
   Post.findByIdAndUpdate(
     { _id: req.body.postId },
     {
-      $push: { likes: req.user._id },
+      $push: { likes: req.body.userid },
     },
     {
       new: true,
     }
   ).exec((err, result) => {
     if (err) {
+      console.log(result.likes.length);
       res.json({ error: err });
     } else {
-      res.json({ message: "Liked successfully" });
+      res.json({ message: "Liked successfully", likes: result.likes.length });
     }
   });
 });
 
 router.put("/unlike", requireLogin, (req, res) => {
+  console.log("backendUU", req.user._id);
   Post.findByIdAndUpdate(
     { _id: req.body.postId },
     {
-      $pull: { likes: req.user._id },
+      $pull: { likes: req.body.userid },
     },
     {
       new: true,
@@ -79,7 +82,8 @@ router.put("/unlike", requireLogin, (req, res) => {
     if (err) {
       res.json({ error: err });
     } else {
-      res.json({ message: "Unliked successfully" });
+      console.log(result.likes.length);
+      res.json({ message: "Unliked successfully", likes: result.likes.length });
     }
   });
 });
