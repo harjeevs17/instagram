@@ -90,6 +90,7 @@ router.put("/unlike", requireLogin, (req, res) => {
 });
 
 router.put("/comment", requireLogin, (req, res) => {
+  console.log(req.user._id);
   const data = {
     text: req.body.comment,
     postedBy: req.user._id,
@@ -108,7 +109,7 @@ router.put("/comment", requireLogin, (req, res) => {
       if (err) {
         res.json({ error: err });
       } else {
-        res.json({ message: "Commend added successfully" });
+        res.json({ message: "Commend added successfully", result: result });
       }
     });
 });
