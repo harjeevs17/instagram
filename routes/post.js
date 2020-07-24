@@ -114,4 +114,24 @@ router.put("/comment", requireLogin, (req, res) => {
     });
 });
 
+router.delete("/delete/:id", requireLogin, (req, res) => {
+  Post.findOne({ _id: req.params.id }).exec((err, post) => {
+    if (!post) {
+      res.json({ error: "Post not found" });
+    } else {
+      if (post.postedBy.toString() == req.user._id.toString()) {
+        console.log("delete it");
+        post
+          .remove()
+          .then((res) => {
+            res.json({ message: "Delete successfully" });
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      }
+    }
+  });
+});
+
 module.exports = router;
