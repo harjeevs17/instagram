@@ -23,6 +23,7 @@ require("./models/post");
 app.use(express.json()); // this will accept json values
 app.use(require("./routes/auth"));
 app.use(require("./routes/post"));
+app.use(require("./routes/user"));
 /*Middleware*/
 const middleware = (req, res, next) => {
   console.log("This is the middle for about");
