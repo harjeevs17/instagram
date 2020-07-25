@@ -15,8 +15,8 @@ router.get("/protected", requireLogin, (req, res) => {
 });
 
 router.post("/signup", (req, res) => {
-  const { name, email, password } = req.body;
-  if (!name || !email || !password) {
+  const { name, email, password, picture } = req.body;
+  if (!name || !email || !password || !picture) {
     return res.json({ error: "Please enter all fields" });
   }
   User.findOne({ email: email })
@@ -29,6 +29,7 @@ router.post("/signup", (req, res) => {
           name: name,
           email: email,
           password: hashedPassword,
+          picture: picture,
         });
         user
           .save()
@@ -65,11 +66,18 @@ router.post("/signin", (req, res) => {
             /*res.json({ message: "User logged in" });
             return savedUser;*/
             //console.log(savedUser);
-            const { _id, name, email, followers, following } = savedUser;
+            const {
+              _id,
+              name,
+              email,
+              followers,
+              following,
+              picture,
+            } = savedUser;
             const token = jwt.sign({ _id: savedUser._id }, JWT_SECRET);
             return res.json({
               token: token,
-              user: { _id, name, email, followers, following },
+              user: { _id, name, email, followers, following, picture },
             });
           }
         })

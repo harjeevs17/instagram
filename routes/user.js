@@ -89,4 +89,20 @@ router.get("/unfollowUser/:unfollowId", requireLogin, (req, res) => {
   );
 });
 
+router.post("/updatePicture", requireLogin, (req, res) => {
+  User.findByIdAndUpdate(
+    req.user._id,
+    {
+      $set: { picture: req.body.picture },
+    },
+    { new: true },
+    (err, result) => {
+      if (err) {
+        return res.json({ error: err });
+      }
+      return res.json(result);
+    }
+  );
+});
+
 module.exports = router;
