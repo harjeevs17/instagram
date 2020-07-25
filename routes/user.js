@@ -24,4 +24,69 @@ router.get("/userprofile/:id", requireLogin, (req, res) => {
       return res.json({ error: "User not found" });
     });
 });
+
+router.get("/followUser/:followId", requireLogin, (req, res) => {
+  User.findByIdAndUpdate(
+    req.params.followId,
+    {
+      $push: { followers: req.user._id },
+    },
+    {
+      new: true,
+    },
+    (err, result1) => {
+      if (err) {
+        return res.json({ error: err });
+      }
+      User.findByIdAndUpdate(
+        req.user._id,
+        {
+          $push: { following: req.params.followId },
+        },
+        {
+          new: true,
+        }
+      )
+        .then((result2) => {
+          res.json({ result1, result2 });
+        })
+        .catch((err) => {
+          res.json({ error: err });
+        });
+    }
+  );
+});
+
+router.get("/unfollowUser/:unfollowId", requireLogin, (req, res) => {
+  User.findByIdAndUpdate(
+    req.params.unfollowId,
+    {
+      $pull: { followers: req.user._id },
+    },
+    {
+      new: true,
+    },
+    (err, result1) => {
+      if (err) {
+        return res.json({ error: err });
+      }
+      User.findByIdAndUpdate(
+        req.user._id,
+        {
+          $pull: { following: req.params.unfollowId },
+        },
+        {
+          new: true,
+        }
+      )
+        .then((result2) => {
+          res.json({ result1, result2 });
+        })
+        .catch((err) => {
+          res.json({ error: err });
+        });
+    }
+  );
+});
+
 module.exports = router;

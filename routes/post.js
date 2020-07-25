@@ -6,9 +6,12 @@ mongoose.set("useFindAndModify", false);
 
 const requireLogin = require("../middleware/requireLogin");
 router.get("/allpost", requireLogin, (req, res) => {
-  Post.find()
+  let followersArray = req.user.following;
+  followersArray.push(req.user._id);
+  Post.find({ postedBy: { $in: followersArray } })
     .populate("postedBy", "_id name")
     .populate("comments.postedBy", "_id name")
+    .sort({ _id: -1 })
     .then((result) => {
       res.json({ posts: result });
     })
