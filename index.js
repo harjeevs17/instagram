@@ -2,6 +2,10 @@ const express = require("express");
 const app = express();
 const PORT = 5000;
 const mongoose = require("mongoose");
+const http = require("http").Server(app);
+
+const io = require("socket.io")(http);
+
 var cors = require("cors");
 const { MONGOURI } = require("./keys");
 
@@ -40,7 +44,18 @@ app.get("/about-us", middleware, (req, res) => {
   res.send("About us");
 });
 
+io.on("connection", (client) => {
+  client.on("subscribeToTimer", (interval) => {
+    console.log("client is subscribing to timer with interval ", interval);
+    setInterval(() => {
+      client.emit("timer", new Date());
+    }, interval);
+  });
+});
+
 /*Listen*/
-app.listen(PORT, () => {
+//io.listen(PORT);
+
+const server = http.listen(PORT, () => {
   console.log("Listening to port", PORT);
 });
